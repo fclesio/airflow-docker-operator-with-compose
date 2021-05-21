@@ -16,7 +16,7 @@ default_args = {
 'retry_delay'           : timedelta(minutes=5)
 }
 
-with DAG('docker_dag', default_args=default_args, schedule_interval="5 * * * *", catchup=False) as dag:
+with DAG('docker_operator_dag', default_args=default_args, schedule_interval="5 * * * *", catchup=False) as dag:
     start_dag = DummyOperator(
         task_id='start_dag'
         )
@@ -33,7 +33,7 @@ with DAG('docker_dag', default_args=default_args, schedule_interval="5 * * * *",
     t2 = DockerOperator(
         task_id='docker_command_sleep',
         image='docker_image_task',
-        container_name='airflow_docker_operator_task_docker_command_sleep',
+        container_name='task___command_sleep',
         api_version='auto',
         auto_remove=True,
         command="/bin/sleep 30",
@@ -41,25 +41,25 @@ with DAG('docker_dag', default_args=default_args, schedule_interval="5 * * * *",
         network_mode="bridge"
         )
 
-    t3 = DockerOperator(
+    t3 = BashOperator(
+        task_id='kill_old_image',
+        bash_command='echo "hello world"'
+        )
+
+    t4 = DockerOperator(
         task_id='docker_command_hello',
         image='docker_image_task',
-        container_name='airflow_docker_operator_task_docker_command_hello',
+        container_name='task___command_hello',
         api_version='auto',
         auto_remove=True,
-        command=["/bin/sleep 15", "echo Hello DockerOperator"],
+        command="echo Hello DockerOperator",
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge"
-        )        
+        )
 
-    t4 = BashOperator(
+    t5 = BashOperator(
         task_id='print_hello',
         bash_command='echo "hello world"'
         )
 
-    start_dag >> t1
-
-    t1 >> t2 >> t4
-    t1 >> t3 >> t4
-
-    t4 >> end_dag
+    start_dag >> t1 >> t2 >> t3 >> t4 >> t5 >> end_dag
