@@ -41,25 +41,25 @@ with DAG('docker_operator_dag', default_args=default_args, schedule_interval="5 
         network_mode="bridge"
         )
 
-    t3 = BashOperator(
-        task_id='kill_old_image',
-        bash_command='echo "hello world"'
-        )
-
-    t4 = DockerOperator(
+    t3 = DockerOperator(
         task_id='docker_command_hello',
         image='docker_image_task',
         container_name='task___command_hello',
         api_version='auto',
         auto_remove=True,
-        command="echo Hello DockerOperator",
+        command="/bin/sleep 40",
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge"
         )
 
-    t5 = BashOperator(
+    t4 = BashOperator(
         task_id='print_hello',
         bash_command='echo "hello world"'
         )
 
-    start_dag >> t1 >> t2 >> t3 >> t4 >> t5 >> end_dag
+    start_dag >> t1 
+    
+    t1 >> t2 >> t4
+    t1 >> t3 >> t4
+
+    t4 >> end_dag

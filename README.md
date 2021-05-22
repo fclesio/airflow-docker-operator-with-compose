@@ -7,12 +7,25 @@ Most of tutorials just explains how to use the [Airflow DockerOperator](https://
 - [@fclesio](https://www.github.com/fclesio)
 
 ## Setup
-1) First create a container with the webservice and create the `airflow` user, [as described in the official docs](https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html), or execute the following script below:
+1) First create a container with the webservice and create the `airflow` user, [as described in the official docs](https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html):
+
+```bash
+$ docker-compose up airflow-init
+```
+
+or execute the following script below:
 ```bash
 $ bash bin/initial_setup.sh
 ```
 
-2) With this initial setup made, start the webservice and other components via `docker-compose`, or execute the following script below that will do the same thing:
+2) With this initial setup made, start the webservice and other components via `docker-compose`, 
+
+```bash
+$ docker build -f dags/docker_job/Dockerfile -t docker_image_task . && \
+docker-compose up -d
+```
+
+or execute the following script below that will do the same thing:
 ```bash
 $ bash bin/start.sh
 ```
